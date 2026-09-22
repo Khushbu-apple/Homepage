@@ -69,6 +69,7 @@ function filterPubs(kind,btn){
   );
 }
 
+<script>
 async function loadPublications(){
   try{
     const response = await fetch(API_BASE + '/api/publications');
@@ -78,22 +79,25 @@ async function loadPublications(){
     const container = document.getElementById('pubs');
 
     container.innerHTML = publications.map(p => `
-      <article class="pub ${p.type || 'journal'}">
-        <div class="year">${p.year || ''}</div>
+      <div class="pub ${String(p.journal || '').toLowerCase().includes('conference') ? 'conference' : 'journal'}">
         <div>
+          <div class="year">${p.year || ''} · ${p.journal || 'Publication'}</div>
           <h3>${p.title || ''}</h3>
           <p>${p.authors || ''}</p>
-          <p><strong>${p.venue || ''}</strong></p>
-          ${p.doi ? `<a href="${p.doi}" target="_blank" rel="noopener">View publication →</a>` : ''}
         </div>
-      </article>
+        ${
+          p.doi
+            ? `<a class="pill" href="${p.doi}" target="_blank" rel="noopener">DOI ↗</a>`
+            : p.url
+              ? `<a class="pill" href="${p.url}" target="_blank" rel="noopener">View ↗</a>`
+              : `<span class="pill">${p.journal || 'Publication'}</span>`
+        }
+      </div>
     `).join('');
 
   }catch(error){
     console.error('Publication loading error:', error);
   }
 }
-
-loadPublications();
 </script>
 </body></html>
