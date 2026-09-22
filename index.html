@@ -60,5 +60,40 @@
 <section id="journey"><div class="wrap"><div class="head"><div class="eyebrow">Journey</div><h2>An international research foundation.</h2></div><div class="timeline"><div class="tl"><div class="eyebrow">2009–2014</div><h3>PhD · NIT Rourkela</h3><p>Metallurgical and Materials Engineering. Thesis on Cu-Al2O3 and Al-Al2O3 micro- and nano-particulate composites.</p></div><div class="tl"><div class="eyebrow">2014–2015</div><h3>University of Oxford · Postdoctoral Research</h3><p>Department of Materials.</p></div><div class="tl"><div class="eyebrow">2014</div><h3>Charles University · Postdoctoral Research</h3><p>Department of Physics of Materials.</p></div><div class="tl"><div class="eyebrow">2015 onward</div><h3>IISc Bengaluru · Materials Engineering</h3><p>Postdoctoral research and advanced materials work.</p></div><div class="tl"><div class="eyebrow">Present</div><h3>Amrita Vishwa Vidyapeetham · Chennai</h3><p>Assistant Professor, School of Engineering.</p></div></div></div></section>
 <section id="contact"><div class="wrap"><div class="contact"><div class="eyebrow">Collaborate</div><h2>Let's build something useful.</h2><p>For research collaboration, PhD opportunities, invited talks, project discussions or industry-linked materials research.</p><a class="btn" href="mailto:d_khushbu@ch.amrita.edu">d_khushbu@ch.amrita.edu</a></div></div></section>
 </main><footer class="footer"><div class="wrap foot"><span>© 2026 Dr. Khushbu Dash · Academic Research Portfolio</span><span>Amrita Vishwa Vidyapeetham · Chennai</span></div></footer>
-<script>function filterPubs(kind,btn){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.pub').forEach(x=>x.style.display=(kind==='all'||x.classList.contains(kind))?'grid':'none')}</script>
+<script>
+function filterPubs(kind,btn){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.pub').forEach(x=>
+    x.style.display=(kind==='all'||x.classList.contains(kind))?'grid':'none'
+  );
+}
+
+async function loadPublications(){
+  try{
+    const response = await fetch(API_BASE + '/api/publications');
+    if(!response.ok) throw new Error('Could not load publications');
+
+    const publications = await response.json();
+    const container = document.getElementById('pubs');
+
+    container.innerHTML = publications.map(p => `
+      <article class="pub ${p.type || 'journal'}">
+        <div class="year">${p.year || ''}</div>
+        <div>
+          <h3>${p.title || ''}</h3>
+          <p>${p.authors || ''}</p>
+          <p><strong>${p.venue || ''}</strong></p>
+          ${p.doi ? `<a href="${p.doi}" target="_blank" rel="noopener">View publication →</a>` : ''}
+        </div>
+      </article>
+    `).join('');
+
+  }catch(error){
+    console.error('Publication loading error:', error);
+  }
+}
+
+loadPublications();
+</script>
 </body></html>
