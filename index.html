@@ -58,43 +58,54 @@
 </div><div style="margin-top:28px"><a class="btn dark" href="https://scholar.google.com/citations?user=OZv8micAAAAJ&hl=en" target="_blank">View complete Google Scholar profile ↗</a></div></div></section>
 <section id="team"><div class="wrap"><div class="head"><div class="eyebrow">Team</div><h2>Research is a team sport.</h2><p>A dedicated space for students, research scholars, collaborators and project partners. Names and profiles can be added as the team directory grows.</p></div><div class="teamgrid"><div class="person"><div class="avatar">KD</div><h3>Dr. Khushbu Dash</h3><small>Principal Investigator / Faculty</small><p>Advanced materials, HEAs, composites, microstructure and materials informatics.</p></div><div class="person"><div class="avatar">RS</div><h3>Research Scholars</h3><small>PhD / Project Researchers</small><p>Profiles for current scholars can be added here with research topic, publication links and ORCID.</p></div><div class="person"><div class="avatar">RC</div><h3>Research Collaborators</h3><small>Academic & Industry</small><p>Add collaborating faculty, laboratories, institutions and industry partners with links to their work.</p></div></div><div class="teamnote"><strong>Team page structure:</strong> each member can have a photo, role, research topic, Google Scholar/ORCID link and selected publications. Send the names and photos when ready and this section can be populated without changing the design.</div></div></section>
   <script>
-async function syncTeam(){
-  try{
-    const r=await fetch(API_BASE+'/api/team');
-    if(!r.ok)return;
+async function syncTeam()
+  <script>
 
-    const data=await r.json();
-    const grid=document.querySelector('#team .teamgrid');
-    if(!grid)return;
+    const r = await fetch(API_BASE + '/api/team');
+    if(!r.ok) return;
 
-    data.forEach(p=>{
-      const name=(p.name||'').trim();
-      if(!name)return;
+    const data = await r.json();
 
-      const exists=[...grid.querySelectorAll('.person h3')]
-        .some(h=>h.textContent.trim()===name);
+    const cards = document.querySelectorAll('#team .teamgrid .person');
+    if(cards.length < 2) return;
 
-      if(exists)return;
+    // The second card is the existing "Research Scholars" card
+    const scholarsCard = cards[1];
 
-      const card=document.createElement('div');
-      card.className='person';
+    data.forEach(p => {
+      const name = (p.name || '').trim();
+      if(!name) return;
 
-      card.innerHTML=`
-        ${p.photo ? `<img src="${p.photo}" alt="${name}">` : ''}
-        <h3>${name}</h3>
-        <p>${p.role||''}</p>
+      // Don't add a person twice
+      const exists = [...scholarsCard.querySelectorAll('.team-member')]
+        .some(el => el.dataset.name === name);
+
+      if(exists) return;
+
+      const member = document.createElement('div');
+      member.className = 'team-member';
+      member.dataset.name = name;
+
+      member.innerHTML = `
+        <strong>${name}</strong>
+        ${p.role ? `<small>${p.role}</small>` : ''}
         ${p.bio ? `<p>${p.bio}</p>` : ''}
+        ${p.orcid ? `<a href="${p.orcid}" target="_blank" rel="noopener">ORCID ↗</a>` : ''}
+        ${p.scholar ? `<a href="${p.scholar}" target="_blank" rel="noopener">Google Scholar ↗</a>` : ''}
       `;
 
-      grid.appendChild(card);
+      scholarsCard.appendChild(member);
     });
+
   }catch(e){
-    console.error('Team sync failed:',e);
+    console.error('Team sync failed:', e);
   }
 }
 
 syncTeam();
 </script>
+
+
 <section id="journey"><div class="wrap"><div class="head"><div class="eyebrow">Journey</div><h2>An international research foundation.</h2></div><div class="timeline"><div class="tl"><div class="eyebrow">2009–2014</div><h3>PhD · NIT Rourkela</h3><p>Metallurgical and Materials Engineering. Thesis on Cu-Al2O3 and Al-Al2O3 micro- and nano-particulate composites.</p></div><div class="tl"><div class="eyebrow">2014–2015</div><h3>University of Oxford · Postdoctoral Research</h3><p>Department of Materials.</p></div><div class="tl"><div class="eyebrow">2014</div><h3>Charles University · Postdoctoral Research</h3><p>Department of Physics of Materials.</p></div><div class="tl"><div class="eyebrow">2015 onward</div><h3>IISc Bengaluru · Materials Engineering</h3><p>Postdoctoral research and advanced materials work.</p></div><div class="tl"><div class="eyebrow">Present</div><h3>Amrita Vishwa Vidyapeetham · Chennai</h3><p>Assistant Professor, School of Engineering.</p></div></div></div></section>
 <section id="contact"><div class="wrap"><div class="contact"><div class="eyebrow">Collaborate</div><h2>Let's build something useful.</h2><p>For research collaboration, PhD opportunities, invited talks, project discussions or industry-linked materials research.</p><a class="btn" href="mailto:d_khushbu@ch.amrita.edu">d_khushbu@ch.amrita.edu</a></div></div></section>
 </main><footer class="footer"><div class="wrap foot"><span>© 2026 Dr. Khushbu Dash · Academic Research Portfolio</span><span>Amrita Vishwa Vidyapeetham · Chennai</span></div></footer>
