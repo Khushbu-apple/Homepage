@@ -58,47 +58,52 @@
 </div><div style="margin-top:28px"><a class="btn dark" href="https://scholar.google.com/citations?user=OZv8micAAAAJ&hl=en" target="_blank">View complete Google Scholar profile ↗</a></div></div></section>
 <section id="team"><div class="wrap"><div class="head"><div class="eyebrow">Team</div><h2>Research is a team sport.</h2><p>A dedicated space for students, research scholars, collaborators and project partners. Names and profiles can be added as the team directory grows.</p></div><div class="teamgrid"><div class="person"><div class="avatar">KD</div><h3>Dr. Khushbu Dash</h3><small>Principal Investigator / Faculty</small><p>Advanced materials, HEAs, composites, microstructure and materials informatics.</p></div><div class="person"><div class="avatar">RS</div><h3>Research Scholars</h3><small>PhD / Project Researchers</small><p>Profiles for current scholars can be added here with research topic, publication links and ORCID.</p></div><div class="person"><div class="avatar">RC</div><h3>Research Collaborators</h3><small>Academic & Industry</small><p>Add collaborating faculty, laboratories, institutions and industry partners with links to their work.</p></div></div><div class="teamnote"><strong>Team page structure:</strong> each member can have a photo, role, research topic, Google Scholar/ORCID link and selected publications. Send the names and photos when ready and this section can be populated without changing the design.</div></div></section>
   <script>
-async function syncTeam()
-  <script>
+    
+ <script>
+async function syncTeam(){
+  try{
+    const response = await fetch(API_BASE + '/api/team');
+    if(!response.ok) throw new Error('Could not load team');
 
-    const r = await fetch(API_BASE + '/api/team');
-    if(!r.ok) return;
+    const team = await response.json();
 
-    const data = await r.json();
+    const teamGrid = document.querySelector('#team .teamgrid');
+    if(!teamGrid) return;
 
-    const cards = document.querySelectorAll('#team .teamgrid .person');
-    if(cards.length < 2) return;
+    // Existing Research Scholars card is the second card
+    const scholarCard = teamGrid.querySelectorAll('.person')[1];
+    if(!scholarCard) return;
 
-    // The second card is the existing "Research Scholars" card
-    const scholarsCard = cards[1];
+    // Remove previously synced scholars
+    scholarCard.querySelectorAll('.dynamic-scholar').forEach(el => el.remove());
 
-    data.forEach(p => {
-      const name = (p.name || '').trim();
-      if(!name) return;
+    team.forEach(member => {
+      const card = document.createElement('div');
+      card.className = 'dynamic-scholar';
 
-      // Don't add a person twice
-      const exists = [...scholarsCard.querySelectorAll('.team-member')]
-        .some(el => el.dataset.name === name);
+      card.innerHTML = `
+        <div class="avatar">
+          ${(member.name || '').split(' ').map(x => x[0]).join('').slice(0,2).toUpperCase()}
+        </div>
 
-      if(exists) return;
+        <h4>${member.name || ''}</h4>
 
-      const member = document.createElement('div');
-      member.className = 'team-member';
-      member.dataset.name = name;
+        <small>${member.role || ''}</small>
 
-      member.innerHTML = `
-        <strong>${name}</strong>
-        ${p.role ? `<small>${p.role}</small>` : ''}
-        ${p.bio ? `<p>${p.bio}</p>` : ''}
-        ${p.orcid ? `<a href="${p.orcid}" target="_blank" rel="noopener">ORCID ↗</a>` : ''}
-        ${p.scholar ? `<a href="${p.scholar}" target="_blank" rel="noopener">Google Scholar ↗</a>` : ''}
+        <p>${member.research_area || ''}</p>
+
+        ${
+          member.profile_url
+          ? `<a href="${member.profile_url}" target="_blank" rel="noopener">Profile ↗</a>`
+          : ''
+        }
       `;
 
-      scholarsCard.appendChild(member);
+      scholarCard.appendChild(card);
     });
 
-  }catch(e){
-    console.error('Team sync failed:', e);
+  }catch(error){
+    console.error('Team loading error:', error);
   }
 }
 
